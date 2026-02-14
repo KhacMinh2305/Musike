@@ -14,7 +14,7 @@
         android:theme="@style/Theme.Musike">
 
         <activity
-            android:name=".myapp.ui.view.home.HomeActivity"
+            android:name=".myapp.ui.view.HomeActivity"
             android:exported="true"
             android:theme="@style/Theme.Musike">
             <intent-filter>
