@@ -1,5 +1,4 @@
 package com.example.musike.myapp.data.repository.playlist
-
 import com.example.musike.myapp.data.model.remote.Playlist
 import com.example.musike.myapp.data.model.usage.DataState
 import com.example.musike.myapp.data.source.playlist.remote.RemotePlaylistDataSource
@@ -16,12 +15,18 @@ class PlaylistRepositoryImpl(
 
     override suspend fun getPlaylist(): StateFlow<DataState<List<Playlist>>> {
         if (_playlistState.value.loaded) return playlistFlow
+        loadPlaylists()
+        return playlistFlow
+    }
+
+    override suspend fun reloadPlaylists() = loadPlaylists()
+
+    private suspend fun loadPlaylists() {
         _playlistState.value = try {
             DataState(remoteDataSource.getMadeForYouPlaylists(), null, true)
         } catch (e: Exception) {
             DataState(null, e.message, true)
         }
-        return playlistFlow
     }
 
 }

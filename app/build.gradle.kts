@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -66,6 +67,10 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.compose)
 
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // Retrofit & Gson
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
@@ -73,5 +78,6 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
 
 }

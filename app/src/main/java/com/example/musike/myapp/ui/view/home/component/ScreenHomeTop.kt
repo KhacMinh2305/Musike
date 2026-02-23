@@ -58,11 +58,12 @@ fun ScreenHomeTop(
         )
 
         ButtonIcon(
-            iconRes = R.drawable.ic_home_account,
+            iconRes = R.drawable.ic_account,
             pStart = 7,
             pTop = 10,
             pEnd = 10,
             pBottom = 10,
+            scale = 0.6f,
             onClick = onClickAccount
         )
     }
@@ -73,12 +74,13 @@ private fun ButtonIcon(
     modifier: Modifier = Modifier,
     iconRes: Int,
     pStart: Int, pTop: Int, pEnd: Int, pBottom: Int,
+    scale: Float = 1f,
     onClick: () -> Unit
 ) {
     Box(
         modifier = modifier
             .wrapContentSize(align = Alignment.Center)
-            .scale(1.2f)
+            .scale(scale)
             .clickable { onClick() }
             .padding(start = pStart.dp, top = pTop.dp, end = pEnd.dp, bottom = pBottom.dp)
     ) {

@@ -9,6 +9,7 @@ import com.example.musike.myapp.data.model.usage.UiState
 import com.example.musike.myapp.data.repository.playlist.PlaylistRepository
 import com.example.musike.myapp.data.repository.singer.SingerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -27,11 +28,11 @@ class HomeViewModel @Inject constructor(
     val singerDataState = _playListDataState.asStateFlow()
 
     init {
-        getPlaylist()
-        getSinger()
+        observePlaylists()
+        observeSingers()
     }
 
-    private fun getPlaylist() {
+    private fun observePlaylists() {
         viewModelScope.launch {
             playlistRepo.getPlaylist().collect { state ->
                 state.mData?.let {
@@ -46,16 +47,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getSinger() {
+    private fun observeSingers() {
         viewModelScope.launch {
             singerRepo.getSingers().collect { state ->
                 state.mData?.let {
-                    Log.d("SingerData", "getSinger: ${state.mData.size}")
                     _singerDataState.value = UiState.Success(state.mData)
                     return@collect
                 }
                 state.error?.let {
-                    Log.d("SingerData", "getSinger: ${state.error}")
                     _singerDataState.value = UiState.Error(state.error)
                     return@collect
                 }
@@ -63,4 +62,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun reloadPlaylists() {
+        _playListDataState.value = UiState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            playlistRepo.reloadPlaylists()
+        }
+    }
+
+    fun reloadSingers() {
+
+    }
 }

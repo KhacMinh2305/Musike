@@ -24,16 +24,20 @@ fun ScreenHome() {
             .background(white)
     ) {
         ScreenHomeTop(
-            12, 12,
+            12, 4,
             onClickNotification = {}, onClickAccount = {}
         )
         ScreenHomeBody(
             playlistState.value,
+            onReloadPlaylists = viewmodel::reloadPlaylists,
+            onReloadSingers = viewmodel::reloadSingers,
+            onReloadSongs = {},
             Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .background(homeBodyColor)
         )
-
     }
+
+
 }

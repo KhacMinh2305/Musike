@@ -8,4 +8,6 @@ interface PlaylistRepository {
 
     suspend fun getPlaylist(): StateFlow<DataState<List<Playlist>>>
 
+    suspend fun reloadPlaylists()
+
 }
