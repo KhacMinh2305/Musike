@@ -3,21 +3,24 @@ package com.example.musike.myapp.data.model.remote
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class Playlist(
+data class Track(
     @SerializedName("id")
     @Expose
-    val id: Int,
-    @SerializedName("imageUrl")
-    @Expose
-    val imageUrl: String,
+    val id: String,
+
     @SerializedName("title")
     @Expose
     val title: String,
+
+    @SerializedName("streamUrl")
+    @Expose
+    val streamUrl: String,
+
     @SerializedName("artists")
     @Expose
     val artists: List<String>,
-    @SerializedName("tracks")
-    @Expose
-    val tracks: List<String>
-)
 
+    @SerializedName("playlists")
+    @Expose
+    val playlists: List<String>
+)
