@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.musike.R
 import com.example.musike.myapp.data.model.remote.Playlist
+import com.example.musike.myapp.data.model.remote.Singer
 import com.example.musike.myapp.data.model.usage.UiState
 import com.example.musike.myapp.ui.theme.black
 import com.example.musike.myapp.ui.theme.seeMoreColor
@@ -38,7 +39,8 @@ import com.example.musike.myapp.ui.theme.white
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun ScreenHomeBody(
-    state: UiState<List<Playlist>>,
+    playlistState: UiState<List<Playlist>>,
+    singerState: UiState<List<Singer>>,
     onReloadPlaylists: () -> Unit,
     onReloadSingers: () -> Unit,
     onReloadSongs: () -> Unit,
@@ -52,7 +54,7 @@ fun ScreenHomeBody(
         // Group for you group
         item {
             PlaylistGroup(
-                state, onClickSeeMore = {},
+                playlistState, onClickSeeMore = {},
                 onClickItem = { playlist -> },
                 onClickReload = onReloadPlaylists,
                 screenWidth = screenWidth,
@@ -64,7 +66,15 @@ fun ScreenHomeBody(
 
         // Group Popular Singer
         item {
-
+            SingerGroup(
+                singerState, onClickSeeMore = {},
+                onClickItem = { singer -> },
+                onClickReload = onReloadSingers,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(start = 0.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)
+            )
         }
     }
 }
@@ -137,7 +147,73 @@ fun PlaylistGroup(
     }
 }
 
+@Composable
+fun SingerGroup(
+    state: UiState<List<Singer>>,
+    onClickSeeMore: () -> Unit,
+    onClickReload: () -> Unit,
+    onClickItem: (Singer) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        GroupHeader(
+            "Popular singer", onClickSeeMore, Modifier
+                .padding(horizontal = 12.dp, vertical = 12.dp)
+        )
 
+        when(state) {
+            is UiState.Loading -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 12.dp, vertical = 0.dp),
+                ) {
+                    item { SingerItemShimmer() }
+                    item { SingerItemShimmer() }
+                    item { SingerItemShimmer() }
+                    item { SingerItemShimmer() }
+                    item { SingerItemShimmer() }
+                    item { SingerItemShimmer() }
+                }
+            }
+
+            is UiState.Success -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 12.dp, vertical = 0.dp)
+                ) {
+                    items(items = state.mData, key = { it.id }) { singer ->
+                        SingerItem(singer.imageUrl, singer.name, modifier = Modifier
+                            .background(white, shape = RoundedCornerShape(12.dp))
+                            .clickable {
+                                onClickItem(singer)
+                            }
+                            .padding(horizontal = 8.dp, vertical = 10.dp))
+                    }
+                }
+            }
+
+            is UiState.Error -> {
+                ErrorLoading(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clickable {
+                            onClickReload()
+                        }
+                        .padding(horizontal = 12.dp, vertical = 20.dp)
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun GroupHeader(

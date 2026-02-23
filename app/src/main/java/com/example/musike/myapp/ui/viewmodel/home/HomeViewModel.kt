@@ -25,7 +25,7 @@ class HomeViewModel @Inject constructor(
     val playlistDataState = _playListDataState.asStateFlow()
 
     private val _singerDataState = MutableStateFlow<UiState<List<Singer>>>(UiState.Loading)
-    val singerDataState = _playListDataState.asStateFlow()
+    val singerDataState = _singerDataState.asStateFlow()
 
     init {
         observePlaylists()

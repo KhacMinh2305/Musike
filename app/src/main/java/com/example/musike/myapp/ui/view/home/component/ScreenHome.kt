@@ -28,7 +28,8 @@ fun ScreenHome() {
             onClickNotification = {}, onClickAccount = {}
         )
         ScreenHomeBody(
-            playlistState.value,
+            playlistState = playlistState.value,
+            singerState = singerState.value,
             onReloadPlaylists = viewmodel::reloadPlaylists,
             onReloadSingers = viewmodel::reloadSingers,
             onReloadSongs = {},
