@@ -41,7 +41,7 @@ fun ScreenHomeTop(
 
         Text(
             text = "Good morning Minh !",
-            fontSize = 21.sp,
+            fontSize = 18.sp,
             color = colorResource(R.color.black),
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Start,

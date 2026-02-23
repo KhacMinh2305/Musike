@@ -64,6 +64,7 @@ dependencies {
 
     // Glide
     implementation(libs.glide)
+    implementation(libs.compose)
 
     // Retrofit & Gson
     implementation(libs.retrofit)
@@ -72,4 +73,5 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.hilt.navigation.compose)
+
 }
