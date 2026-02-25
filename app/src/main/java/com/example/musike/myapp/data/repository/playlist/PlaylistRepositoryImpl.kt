@@ -14,14 +14,14 @@ class PlaylistRepositoryImpl(
     val playlistFlow = _playlistState.asStateFlow()
 
     override suspend fun getPlaylist(): StateFlow<DataState<List<Playlist>>> {
-        if (_playlistState.value.loaded) return playlistFlow
-        loadPlaylists()
+        if (!_playlistState.value.loaded) loadPlaylists()
         return playlistFlow
     }
 
     override suspend fun reloadPlaylists() = loadPlaylists()
 
     private suspend fun loadPlaylists() {
+        _playlistState.value.loaded = false
         _playlistState.value = try {
             DataState(remoteDataSource.getMadeForYouPlaylists(), null, true)
         } catch (e: Exception) {

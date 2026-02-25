@@ -12,15 +12,20 @@ data class Track(
     @Expose
     val title: String,
 
+    @SerializedName("thumbnail")
+    @Expose
+    val thumbnail: String,
+
     @SerializedName("streamUrl")
     @Expose
     val streamUrl: String,
 
     @SerializedName("artists")
     @Expose
-    val artists: List<String>,
+    val artists: List<TrackRef>,
 
     @SerializedName("playlists")
     @Expose
-    val playlists: List<String>
+    val playlists: List<TrackRef>
 )
+

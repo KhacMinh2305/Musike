@@ -8,4 +8,6 @@ interface SingerRepository {
 
     suspend fun getSingers(): StateFlow<DataState<List<Singer>>>
 
+    suspend fun reloadSingers()
+
 }

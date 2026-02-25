@@ -1,4 +1,4 @@
-package com.example.musike.myapp.ui.view.home.component
+package com.example.musike.myapp.ui.view.discover.home.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -45,7 +47,7 @@ fun PlaylistItem(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
     ) {
         AsyncImage(
@@ -60,33 +62,23 @@ fun PlaylistItem(
                 .clip(RoundedCornerShape(12.dp))
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(horizontal = 10.dp, vertical = 2.dp)
-        ) {
-            Text(
-                text = playlistName,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = black,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                modifier = Modifier
-            )
+        Text(
+            text = playlistName,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = black,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
+        )
 
-            Text(
-                text = artistNames,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Light,
-                color = black,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 3,
-                modifier = Modifier
-                    .padding(horizontal = 0.dp, vertical = 5.dp)
-            )
-        }
+        Text(
+            text = artistNames,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Light,
+            color = black,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 3
+        )
     }
 }
 
@@ -123,6 +115,49 @@ fun SingerItem(imageUrl: String, name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun TrackItem(imageUrl: String, name: String, artistName: String, modifier: Modifier = Modifier) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier
+    )  {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(3f / 2f)
+                .clip(RoundedCornerShape(12.dp))
+        )
+
+        Text(
+            text = name,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = black,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Start,
+            maxLines = 1,
+            minLines = 1
+        )
+
+        Text(
+            text = artistName,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Light,
+            color = black,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Start,
+            maxLines = 1,
+            minLines = 1,
+            modifier = Modifier
+                .padding(start = 0.dp, top = 0.dp, end = 0.dp, bottom = 5.dp)
+        )
+
+    }
+}
+
+@Composable
 fun PlaylistItemShimmer(
     screenWidth: Dp
 ) {
@@ -140,8 +175,17 @@ fun PlaylistItemShimmer(
 fun SingerItemShimmer() {
     Box(
         modifier = Modifier
-            .width(69.dp)
+            .width(80.dp)
             .height(100.dp)
+            .shimmerEffect(cornerSize = 12.dp)
+    )
+}
+
+@Composable
+fun TrackItemShimmer(screenWidth: Dp) {
+    Box(
+        modifier = Modifier
+            .size(screenWidth * 0.35f)
             .shimmerEffect(cornerSize = 12.dp)
     )
 }

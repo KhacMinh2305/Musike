@@ -1,4 +1,4 @@
-package com.example.musike.myapp.ui.view.home.component
+package com.example.musike.myapp.ui.view.discover.home.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -86,8 +87,9 @@ private fun ButtonIcon(
     ) {
         Icon(
             painter = painterResource(iconRes),
-            null,
-            modifier = Modifier.wrapContentSize(),
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier.wrapContentSize()
         )
     }
 }

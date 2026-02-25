@@ -4,5 +4,5 @@ import com.example.musike.myapp.data.model.remote.Singer
 
 interface RemoteSingerDataSource {
 
-    suspend fun getSinger(): List<Singer>
+    suspend fun getSingers(): List<Singer>
 }

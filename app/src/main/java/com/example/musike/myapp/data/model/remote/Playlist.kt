@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class Playlist(
     @SerializedName("id")
     @Expose
-    val id: Int,
+    val id: String,
     @SerializedName("imageUrl")
     @Expose
     val imageUrl: String,
@@ -15,7 +15,7 @@ data class Playlist(
     val title: String,
     @SerializedName("artists")
     @Expose
-    val artists: List<String>,
+    val artists: List<PlaylistArtist>,
     @SerializedName("tracks")
     @Expose
     val tracks: List<String>

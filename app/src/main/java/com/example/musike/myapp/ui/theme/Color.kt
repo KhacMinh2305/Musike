@@ -15,3 +15,5 @@ val transparent = Color.Transparent
 val black = Color(0xFF000000)
 val seeMoreColor = Color(0xFF4B8E96)
 val homeBodyColor = Color(0xFFEBF0F5)
+
+val bottomBarIconBackgroundColor = Color(0xFFEBF4F5)

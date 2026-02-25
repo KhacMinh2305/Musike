@@ -6,10 +6,14 @@ import com.example.musike.myapp.data.repository.playlist.PlaylistRepository
 import com.example.musike.myapp.data.repository.playlist.PlaylistRepositoryImpl
 import com.example.musike.myapp.data.repository.singer.SingerRepository
 import com.example.musike.myapp.data.repository.singer.SingerRepositoryImpl
+import com.example.musike.myapp.data.repository.track.TrackRepository
+import com.example.musike.myapp.data.repository.track.TrackRepositoryImpl
 import com.example.musike.myapp.data.source.playlist.remote.RemotePlaylistDataSource
 import com.example.musike.myapp.data.source.playlist.remote.RemotePlaylistDataSourceImpl
 import com.example.musike.myapp.data.source.singer.remote.RemoteSingerDataSource
 import com.example.musike.myapp.data.source.singer.remote.RemoteSingerDataSourceImpl
+import com.example.musike.myapp.data.source.track.remote.RemoteTrackDataSource
+import com.example.musike.myapp.data.source.track.remote.RemoteTrackDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,14 +52,6 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providePlaylistRepository(
-        remoteDataSource: RemotePlaylistDataSource
-    ): PlaylistRepository {
-        return PlaylistRepositoryImpl(remoteDataSource)
-    }
-
-    @Provides
-    @Singleton
     fun provideRemoteSingerDataSource(
         @ApplicationContext context: Context,
         apiService: ApiService
@@ -65,10 +61,35 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideRemoteTrackDataSource(
+        @ApplicationContext context: Context,
+        apiService: ApiService
+    ): RemoteTrackDataSource {
+        return RemoteTrackDataSourceImpl(context, apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun providePlaylistRepository(
+        remoteDataSource: RemotePlaylistDataSource
+    ): PlaylistRepository {
+        return PlaylistRepositoryImpl(remoteDataSource)
+    }
+
+    @Provides
+    @Singleton
     fun provideSingerRepository(
         remoteDataSource: RemoteSingerDataSource
     ): SingerRepository {
         return SingerRepositoryImpl(remoteDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTrackRepository(
+        remoteDataSource: RemoteTrackDataSource
+    ): TrackRepository {
+        return TrackRepositoryImpl(remoteDataSource)
     }
 
 }

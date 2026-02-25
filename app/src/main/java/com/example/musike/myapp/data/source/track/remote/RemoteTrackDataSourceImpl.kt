@@ -1,19 +1,18 @@
-package com.example.musike.myapp.data.source.singer.remote
+package com.example.musike.myapp.data.source.track.remote
 
 import android.content.Context
 import com.example.musike.myapp.data.config.ApiService
-import com.example.musike.myapp.data.model.remote.Singer
+import com.example.musike.myapp.data.model.remote.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.collections.emptyList
 
-class RemoteSingerDataSourceImpl(
+class RemoteTrackDataSourceImpl (
     private val context: Context,
     private val apiService: ApiService
-): RemoteSingerDataSource {
+): RemoteTrackDataSource {
 
-    override suspend fun getSingers(): List<Singer> = withContext(Dispatchers.IO) {
-        val response = apiService.getSingers()
+    override suspend fun getTracks(): List<Track> = withContext(Dispatchers.IO) {
+        val response = apiService.getTracks()
         if(!response.isSuccessful) throw Exception(response.errorBody()?.toString())
         return@withContext response.body() ?: emptyList()
     }

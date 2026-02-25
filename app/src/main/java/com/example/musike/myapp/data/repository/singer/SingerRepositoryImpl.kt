@@ -1,5 +1,6 @@
 package com.example.musike.myapp.data.repository.singer
 
+import android.util.Log
 import com.example.musike.myapp.data.model.remote.Singer
 import com.example.musike.myapp.data.model.usage.DataState
 import com.example.musike.myapp.data.source.singer.remote.RemoteSingerDataSource
@@ -15,12 +16,19 @@ class SingerRepositoryImpl(
     val singerState = _singerState.asStateFlow()
 
     override suspend fun getSingers(): StateFlow<DataState<List<Singer>>> {
-        if (_singerState.value.loaded) return singerState
+        if (!_singerState.value.loaded) loadSingers()
+        return singerState
+    }
+
+    override suspend fun reloadSingers() = loadSingers()
+
+    private suspend fun loadSingers() {
+        _singerState.value.loaded = false
         _singerState.value = try {
-            DataState(remoteDataSource.getSinger(), null, true)
+            DataState(remoteDataSource.getSingers(), null, true)
         } catch (e: Exception) {
             DataState(null, e.message, true)
         }
-        return singerState
     }
+
 }

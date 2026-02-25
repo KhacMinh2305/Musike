@@ -1,4 +1,4 @@
-package com.example.musike.myapp.ui.view.home.component
+package com.example.musike.myapp.ui.view.discover.home.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -13,10 +13,15 @@ import com.example.musike.myapp.ui.theme.white
 import com.example.musike.myapp.ui.viewmodel.home.HomeViewModel
 
 @Composable
-fun ScreenHome() {
+fun ScreenDiscover(
+    navigatePlaylistItem: (String) -> Unit,
+    navigateSingerItem: (String) -> Unit,
+    navigateTrackItem: (String) -> Unit,
+) {
     val viewmodel: HomeViewModel = hiltViewModel()
     val playlistState = viewmodel.playlistDataState.collectAsState()
     val singerState = viewmodel.singerDataState.collectAsState()
+    val trackState = viewmodel.trackDataState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -30,9 +35,13 @@ fun ScreenHome() {
         ScreenHomeBody(
             playlistState = playlistState.value,
             singerState = singerState.value,
+            trackState = trackState.value,
             onReloadPlaylists = viewmodel::reloadPlaylists,
             onReloadSingers = viewmodel::reloadSingers,
-            onReloadSongs = {},
+            onReloadSongs = viewmodel::reloadTracks,
+            navigatePlaylistItem,
+            navigateSingerItem,
+            navigateTrackItem,
             Modifier
                 .fillMaxWidth()
                 .weight(1f)

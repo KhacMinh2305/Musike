@@ -1,4 +1,4 @@
-package com.example.musike.myapp.ui.view.home.component
+package com.example.musike.myapp.ui.view.discover.home.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -31,19 +31,25 @@ import androidx.compose.ui.unit.sp
 import com.example.musike.R
 import com.example.musike.myapp.data.model.remote.Playlist
 import com.example.musike.myapp.data.model.remote.Singer
+import com.example.musike.myapp.data.model.remote.Track
 import com.example.musike.myapp.data.model.usage.UiState
 import com.example.musike.myapp.ui.theme.black
 import com.example.musike.myapp.ui.theme.seeMoreColor
 import com.example.musike.myapp.ui.theme.white
+import kotlin.math.sin
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun ScreenHomeBody(
     playlistState: UiState<List<Playlist>>,
     singerState: UiState<List<Singer>>,
+    trackState: UiState<List<Track>>,
     onReloadPlaylists: () -> Unit,
     onReloadSingers: () -> Unit,
     onReloadSongs: () -> Unit,
+    navigatePlaylistItem: (String) -> Unit,
+    navigateSingerItem: (String) -> Unit,
+    navigateTrackItem: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -51,11 +57,11 @@ fun ScreenHomeBody(
 
     LazyColumn(modifier = modifier) {
 
-        // Group for you group
+        // Group playlists
         item {
             PlaylistGroup(
                 playlistState, onClickSeeMore = {},
-                onClickItem = { playlist -> },
+                onClickItem = { playlist -> navigatePlaylistItem(playlist.id) },
                 onClickReload = onReloadPlaylists,
                 screenWidth = screenWidth,
                 modifier = Modifier
@@ -64,12 +70,26 @@ fun ScreenHomeBody(
             )
         }
 
-        // Group Popular Singer
+        // Group artists
         item {
             SingerGroup(
                 singerState, onClickSeeMore = {},
-                onClickItem = { singer -> },
+                onClickItem = { singer -> navigateSingerItem(singer.id) },
                 onClickReload = onReloadSingers,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(start = 0.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)
+            )
+        }
+
+        // Group tracks
+        item {
+            TrackGroup(
+                trackState, onClickSeeMore = {},
+                onClickItem = { track -> navigateTrackItem(track.id) },
+                onClickReload = onReloadSongs,
+                screenWidth = screenWidth,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -91,7 +111,7 @@ fun PlaylistGroup(
 ) {
     Column(modifier = modifier) {
         GroupHeader(
-            "Made for you", onClickSeeMore, Modifier
+            "Playlists", onClickSeeMore, Modifier
                 .padding(horizontal = 12.dp, vertical = 12.dp)
         )
 
@@ -121,7 +141,7 @@ fun PlaylistGroup(
                         PlaylistItem(
                             url = playlist.imageUrl,
                             playlistName = playlist.title,
-                            artistNames = playlist.artists.joinToString(","),
+                            artistNames = playlist.artists.joinToString(", ") { it.name },
                             modifier = Modifier
                                 .width(screenWidth * 0.55f)
                                 .aspectRatio(5f / 4f)
@@ -159,11 +179,11 @@ fun SingerGroup(
         modifier = modifier
     ) {
         GroupHeader(
-            "Popular singer", onClickSeeMore, Modifier
+            "Artists", onClickSeeMore, Modifier
                 .padding(horizontal = 12.dp, vertical = 12.dp)
         )
 
-        when(state) {
+        when (state) {
             is UiState.Loading -> {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -190,12 +210,84 @@ fun SingerGroup(
                         .padding(horizontal = 12.dp, vertical = 0.dp)
                 ) {
                     items(items = state.mData, key = { it.id }) { singer ->
-                        SingerItem(singer.imageUrl, singer.name, modifier = Modifier
-                            .background(white, shape = RoundedCornerShape(12.dp))
-                            .clickable {
-                                onClickItem(singer)
-                            }
-                            .padding(horizontal = 8.dp, vertical = 10.dp))
+                        SingerItem(
+                            singer.imageUrl, singer.name, modifier = Modifier
+                                .background(white, shape = RoundedCornerShape(12.dp))
+                                .clickable {
+                                    onClickItem(singer)
+                                }
+                                .padding(horizontal = 8.dp, vertical = 10.dp))
+                    }
+                }
+            }
+
+            is UiState.Error -> {
+                ErrorLoading(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clickable {
+                            onClickReload()
+                        }
+                        .padding(horizontal = 12.dp, vertical = 20.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TrackGroup(
+    state: UiState<List<Track>>,
+    onClickSeeMore: () -> Unit,
+    onClickReload: () -> Unit,
+    onClickItem: (Track) -> Unit,
+    screenWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        GroupHeader(
+            "Tracks", onClickSeeMore, Modifier
+                .padding(horizontal = 12.dp, vertical = 12.dp)
+        )
+
+        when (state) {
+            is UiState.Loading -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 12.dp, vertical = 0.dp),
+                ) {
+                    item { TrackItemShimmer(screenWidth) }
+                    item { TrackItemShimmer(screenWidth) }
+                    item { TrackItemShimmer(screenWidth) }
+                    item { TrackItemShimmer(screenWidth) }
+                }
+            }
+
+            is UiState.Success -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 12.dp, vertical = 0.dp)
+                ) {
+                    items(items = state.mData, key = { it.id }) { track ->
+                        TrackItem(
+                            track.thumbnail,
+                            track.title,
+                            track.artists.joinToString(", ") { it.name },
+                            modifier = Modifier
+                                .width(screenWidth * 0.35f)
+                                .wrapContentHeight()
+                                .background(white, shape = RoundedCornerShape(12.dp))
+                                .clickable { onClickItem(track) }
+                                .padding(5.dp))
                     }
                 }
             }
