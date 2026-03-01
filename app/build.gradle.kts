@@ -80,4 +80,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
 
+    // ConstraintLayout
+    implementation(libs.androidx.constraintlayout.compose)
+
 }
