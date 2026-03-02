@@ -250,7 +250,6 @@ fun TrackPlayInfo(
 @Composable
 fun PlayerController(
     progress: Float,
-
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -321,7 +320,6 @@ fun PlayerController(
     }
 }
 
-@Preview
 @Composable
 fun CustomSeekbar(
     modifier: Modifier = Modifier,
