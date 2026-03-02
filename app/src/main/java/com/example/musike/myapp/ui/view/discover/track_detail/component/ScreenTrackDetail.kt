@@ -5,28 +5,25 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -48,42 +45,44 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.musike.R
+import com.example.musike.myapp.domain.view.dpToPx
 import com.example.musike.myapp.ui.theme.black
 import com.example.musike.myapp.ui.theme.white
-import androidx.core.graphics.scale
-import com.example.musike.myapp.ui.theme.Pink40
-import com.example.musike.myapp.ui.theme.seeMoreColor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun ScreenTrackDetail(
     navigateBack: () -> Unit
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(white)
     )
     {
 
-        item {
-            TopBar(
-                "Doan Khac Minh", navigateBack, {
+        TopBar(
+            "Doan Khac Minh", navigateBack, {
 
-                }, {
+            }, {
 
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            )
-        }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        )
+
+        ScreenTrackBody(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        )
     }
 }
 
@@ -100,7 +99,7 @@ fun TopBar(
         modifier = modifier
     ) {
 
-        ScreenTrackDetailIconButton(R.drawable.ic_back, onClickBack)
+        ScreenTrackDetailIconButton(iconRes = R.drawable.ic_back, onClick = onClickBack)
 
         Text(
             text = title,
@@ -114,8 +113,8 @@ fun TopBar(
                 .wrapContentHeight()
         )
 
-        ScreenTrackDetailIconButton(R.drawable.ic_heart, onClickLike)
-        ScreenTrackDetailIconButton(R.drawable.ic_more, onClickMore)
+        ScreenTrackDetailIconButton(iconRes = R.drawable.ic_heart, onClick = onClickLike)
+        ScreenTrackDetailIconButton(iconRes = R.drawable.ic_more, onClick = onClickMore)
     }
 }
 
@@ -123,10 +122,6 @@ fun TopBar(
 fun ScreenTrackBody(
     modifier: Modifier = Modifier
 ) {
-
-//    AsyncImage(
-//        model = =
-//    )
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -139,24 +134,25 @@ fun ScreenTrackBody(
         )
 
         PlayerBar(
-            Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .align(Alignment.BottomCenter)
+                .clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp))
         )
     }
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun PlayerBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    clickShare: () -> Unit = {},
+    clickViewPlaylist: () -> Unit = {}
 ) {
 
     ConstraintLayout(
         modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp))
     ) {
 
         val (background, info, control) = createRefs()
@@ -181,8 +177,9 @@ fun PlayerBar(
             )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        TrackPlayInfo(
+            onClickShare = clickShare,
+            onCLickViewPlaylist = clickViewPlaylist,
             modifier = Modifier
                 .constrainAs(info) {
                     width = Dimension.fillToConstraints
@@ -191,145 +188,262 @@ fun PlayerBar(
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
                 }
-                .padding(horizontal = 12.dp, vertical = 15.dp)
-        ) {
+                .padding(start = 12.dp, top = 15.dp, end = 12.dp, bottom = 0.dp))
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+//        PlayerController(
+//            modifier = Modifier
+//                .constrainAs(control) {
+//                    width = Dimension.fillToConstraints
+//                    height = Dimension.wrapContent
+//                    start.linkTo(parent.start)
+//                    top.linkTo(info.bottom)
+//                    end.linkTo(parent.end)
+//                }.padding(start = 12.dp, end = 12.dp, bottom = 15.dp)
+//        )
+    }
+}
+
+@Composable
+fun TrackPlayInfo(
+    modifier: Modifier = Modifier,
+    onClickShare: () -> Unit = {},
+    onCLickViewPlaylist: () -> Unit = {}
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentHeight()
+        ) {
+            Text(
+                text = "Track name",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text(
+                text = "Artist in this track",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        ScreenTrackDetailIconButton(iconRes = R.drawable.ic_share, onClick = onClickShare)
+
+        ScreenTrackDetailIconButton(iconRes = R.drawable.ic_view_playlist, onClick = onCLickViewPlaylist)
+    }
+}
+
+@Composable
+fun PlayerController(
+    progress: Float,
+
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+
+        CustomSeekbar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) { progress ->
+            Log.d("Custom slider", "progress: $progress")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            ScreenTrackDetailIconButton(
+                modifier = Modifier.weight(1f),
+                iconRes = R.drawable.ic_loop
+            ) {
+
+            }
+
+            ScreenTrackDetailIconButton(
+                modifier = Modifier.weight(1f),
+                iconRes = R.drawable.ic_previous
+            ) {
+
+            }
+
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .weight(1f)
-                    .wrapContentHeight()
-            ) {
-                Text(
-                    text = "Track name",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = white,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    .aspectRatio(1f)
+                    .clickable {
 
-                Text(
-                    text = "Artist in this track",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = white,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
+                    }
+                    .padding(5.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_play),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(2.dp)
                 )
             }
 
-            ScreenTrackDetailIconButton(R.drawable.ic_share) {}
+            ScreenTrackDetailIconButton(
+                modifier = Modifier.weight(1f),
+                iconRes = R.drawable.ic_next
+            ) {
 
-            ScreenTrackDetailIconButton(R.drawable.ic_view_playlist) {}
+            }
+
+            ScreenTrackDetailIconButton(
+                modifier = Modifier.weight(1f),
+                iconRes = R.drawable.ic_volumn
+            ) {
+
+            }
         }
     }
 }
 
 @Preview
 @Composable
-fun ABC() {
-    val prog by rememberUpdatedState(0.23f)
-
-    SliderDraw(progress = prog, onProgressChange = {
-
-    })
-}
-
-@Composable
-fun SliderDraw(
+fun CustomSeekbar(
     modifier: Modifier = Modifier,
-    progress: Float,
-    onProgressChange: (Float) -> Unit = {},
-    loadThumb: (suspend (Int, Int) -> Bitmap)? = null
+    initProgress: Float = 0.23f,
+    onProgressChange: (Float) -> Unit = { }
 ) {
-    val tempHeight = 10
-    val normalThumbSize = 30
-    val highlightSize = 40
-    val touchSize = 100
 
-    var thumbImage by remember { mutableStateOf<Bitmap?>(null) }
+    var progress by remember { mutableFloatStateOf(initProgress) }
 
-    var thumbSize by remember { mutableIntStateOf(normalThumbSize) }
+    var isDragging by remember { mutableStateOf(false) }
 
-    var canDrag by remember { mutableStateOf(false) }
+    val trackHeightDp = 5.dp
+    val normalThumbSizeDp = 13.dp
+    val highlightSizeDp = 15.dp
+    val touchSizeDp = 50.dp
 
-    LaunchedEffect(Unit) {
-        thumbImage = withContext(Dispatchers.IO) {
-            loadThumb?.invoke(thumbSize, thumbSize)?.let {
-                if (it.width != thumbSize || it.height != thumbSize) {
-                    it.scale(thumbSize, thumbSize)
-                } else it
-            }
-        }
-    }
+    val normalThumbSize = dpToPx(normalThumbSizeDp)
+    val touchSize = dpToPx(touchSizeDp)
 
-    DisposableEffect(Unit) {
-        onDispose {
-            thumbImage?.recycle()
-        }
-    }
-
-    Canvas(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(color = seeMoreColor)
+    ) {
+
+        SeekbarDraw(
+            progress = progress,
+            trackHeightDp = trackHeightDp,
+            thumbSizeDp = if (isDragging) highlightSizeDp else normalThumbSizeDp,
+            horizontalOffset = highlightSizeDp / 2,
+            startDrag = { size, point ->
+                val totalWidth = size.width
+                val halfTouchSize = touchSize / 2
+                val centerThumbX = normalThumbSize / 2 + ((totalWidth - normalThumbSize) * progress)
+                if (centerThumbX - halfTouchSize <= point.x && point.x <= centerThumbX + halfTouchSize) {
+                    isDragging = true
+                }
+            },
+            onDrag = drag@{ _, amount, size ->
+                if (!isDragging) return@drag
+                val totalWidth = size.width
+                val max = totalWidth - normalThumbSize.toFloat()
+                val newProgress = (progress + amount / max).coerceIn(0f, 1f)
+                if (newProgress != progress) {
+                    progress = newProgress
+                    onProgressChange(newProgress)
+                }
+            },
+            endDrag = {
+                isDragging = false
+            }
+        )
+    }
+}
+
+@Composable
+fun SeekbarDraw(
+    modifier: Modifier = Modifier,
+    thumbImage: Bitmap? = null,
+    progress: Float,
+    trackHeightDp: Dp,
+    thumbSizeDp: Dp,
+    horizontalOffset: Dp,
+    startDrag: (IntSize, Offset) -> Unit,
+    onDrag: (PointerInputChange, Float, IntSize) -> Unit,
+    endDrag: () -> Unit
+) {
+
+    val updatedStartDrag by rememberUpdatedState(startDrag)
+
+    val updatedOnDrag by rememberUpdatedState(onDrag)
+
+    val updatedEndDrag by rememberUpdatedState(endDrag)
+
+    val trackHeight = dpToPx(trackHeightDp)
+    val thumbSize = dpToPx(thumbSizeDp)
+    val horizontalOffset = dpToPx(horizontalOffset)
+
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
-                    onDragStart = { start: Offset ->
-                        // check if start point is inside allowed area
-                        val (width, height) = size
-                        val halfTouchSize = touchSize.toFloat() / 2
-                        val halfThumbSize = thumbSize.toFloat() / 2
-                        val centerThumbX = halfThumbSize + ((width - thumbSize) * progress)
-                        if (centerThumbX - halfTouchSize <= start.x && start.x <= centerThumbX + halfTouchSize) {
-                            canDrag = true
-                            thumbSize = highlightSize
-                        }
+                    onDragStart = { start: Offset -> updatedStartDrag(size, start) },
+                    onHorizontalDrag = { change, dragAmount ->
+                        updatedOnDrag(
+                            change,
+                            dragAmount,
+                            size
+                        )
                     },
-                    onHorizontalDrag = { change: PointerInputChange, dragAmount: Float ->
-                        val total = size.width - normalThumbSize
-                        val updated = progress * total + dragAmount
-                        onProgressChange(updated / total)
-                    },
-                    onDragEnd = {
-                        canDrag = false
-                        thumbSize = normalThumbSize
-                    }
+                    onDragEnd = updatedEndDrag
                 )
             }
     ) {
 
         val width = size.width
         val height = size.height
-        val startOffset = thumbSize.toFloat() / 2
-        val barWidth = width - thumbSize
+        val barWidth = width - horizontalOffset * 2
 
-        // draw active part
+        // draw active track
         val activeWidth = barWidth * progress
         drawRoundRect(
-            color = Pink40,
-            topLeft = Offset(startOffset, (height - tempHeight) / 2),
-            size = Size(activeWidth, tempHeight.toFloat()),
+            color = white,
+            topLeft = Offset(horizontalOffset, (height - trackHeight) / 2),
+            size = Size(activeWidth, trackHeight),
             cornerRadius = CornerRadius(0.5f),
             style = Fill
         )
 
-        // draw inactive part
+        // draw inactive track
         val inactiveWidth = barWidth - activeWidth
         drawRoundRect(
-            color = Pink40.copy(alpha = 0.3f),
-            topLeft = Offset(startOffset + activeWidth, (height - tempHeight) / 2),
-            size = Size(inactiveWidth, tempHeight.toFloat()),
+            color = white.copy(alpha = 0.5f),
+            topLeft = Offset(horizontalOffset + activeWidth, (height - trackHeight) / 2),
+            size = Size(inactiveWidth, trackHeight),
             cornerRadius = CornerRadius(0.5f),
             style = Fill
         )
 
         // draw thumb
-        val thumbX = startOffset + activeWidth - (thumbSize / 2)
+        val thumbX = horizontalOffset + activeWidth - (thumbSize / 2)
         val thumbY = (height - thumbSize) / 2
         thumbImage?.let { img ->
             drawImage(
@@ -338,17 +452,22 @@ fun SliderDraw(
             )
         } ?: run {
             drawCircle(
-                color = black,
-                radius = thumbSize.toFloat() / 2,
-                center = Offset(startOffset + activeWidth, height / 2)
+                color = white,
+                radius = thumbSize / 2,
+                center = Offset(horizontalOffset + activeWidth, height / 2)
             )
         }
     }
 }
 
 @Composable
-fun ScreenTrackDetailIconButton(iconRes: Int, onClick: () -> Unit) {
+fun ScreenTrackDetailIconButton(
+    modifier: Modifier = Modifier,
+    iconRes: Int,
+    onClick: () -> Unit
+) {
     IconButton(
+        modifier = modifier,
         onClick = onClick
     ) {
         Icon(
